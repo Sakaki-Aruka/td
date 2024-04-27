@@ -74,6 +74,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         url_set.insert(format!("{}.{}", url, extension));
     }
 
+    let extensions : Vec<&str> = vec!["png", "jpg", "jpeg", "webp"];
     let url_regex : Regex = Regex::new("https://pbs.twimg.com/media/([a-zA-Z0-9_]+).([a-zA-Z_]+)").unwrap();
     for url in url_set {
         let img_bytes = reqwest::blocking::get(url.clone())?.bytes()?;
@@ -87,7 +88,11 @@ fn main() -> Result<(), Box<dyn Error>> {
             } }
         };
         file_name = format!("{}.{}", file_name, match capture.get(2) {
-            Some(e) => e.as_str(),
+            Some(e) => {
+                let extension : &str = e.as_str();
+                if !extensions.contains(&extension) { continue; };
+                extension
+            },
             None => continue,
         });
 
